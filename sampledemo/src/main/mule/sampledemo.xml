@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b47f6412-f2fe-41ef-b31a-a9c73636ebe1" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="91bf5488-0fbc-44da-b16b-d4eed8d270ed" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Anilkumar@950" database="anilkumar" />
+	</db:config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="83e3ebe1-8e53-4103-9173-7ac00ab6426f" >
+		<salesforce:basic-connection username="anilkumar1@ibm.com" password="Narendra@123" />
+	</salesforce:sfdc-config>
+	<salesforce:sfdc-config name="Salesforce_Config1" doc:name="Salesforce Config" doc:id="d6f7ae33-a18a-43e7-820a-8c946407957c" >
+		<salesforce:basic-connection username="anilkumar1@ibm.com" password="Narendra@123" securityToken="KEhI6aBfzUaTXieAUppYKFgSA" />
+	</salesforce:sfdc-config>
+	<db:config name="Database_Config1" doc:name="Database Config" doc:id="996dbea0-ab61-489c-b8b2-45439c8d4cfb" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Anilkumar@950" />
+	</db:config>
+	<db:config name="Database_Config2" doc:name="Database Config" doc:id="e75cecef-58f4-475d-b172-b6109ab18ecd" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Anilkumar@950" />
+	</db:config>
+	<http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config" doc:id="8990f2db-0364-4224-9bc7-4c8a948e6132" >
+		<http:listener-connection host="localhost" port="8080" />
+	</http:listener-config>
+	<flow name="sampledemoFlow" doc:id="4c474b9c-cbff-483e-9b29-d7a500368759" >
+		<http:listener doc:name="Listener" doc:id="79ea2c9c-aa87-45a7-a646-094a248a7fc0" config-ref="HTTP_Listener_config" path="sample"/>
+		<db:select doc:name="Select" doc:id="55acf962-af98-42cd-ae56-85a7ed0e85e7" config-ref="Database_Config1">
+			<db:sql ><![CDATA[select * from anilkumar.student]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="368a5cdb-ac90-4729-a2af-41901a628d16" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="7a1f813d-89de-4cf2-872a-fb696fdc0103" message="#[payload]"/>
+	</flow>
+	<flow name="sampledemoFlow1" doc:id="93be0e2a-d645-4ec4-9e73-5d71b9f51199" >
+		<http:listener doc:name="Listener" doc:id="0bdd19d8-6f25-4a27-b2bb-d33c55e1f1e1" config-ref="HTTP_Listener_config1" path="insert"/>
+		<db:insert doc:name="Insert" doc:id="cdd1a9b1-26fd-4e9e-8624-b1b6d99ccdf5" config-ref="Database_Config2">
+			<db:sql ><![CDATA[insert into anilkumar.student(name, id, phno, fee, city, country) values ('venkatesh', 'ab2336', '80778899', '503100', 'n3btr1', 'ap');]]></db:sql>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="047c568a-bf86-45b3-8840-39227fc4e446" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="1b03f230-fc9e-43e6-9ed8-74555d607c40" message="#[payload]"/>
+	</flow>
+</mule>
