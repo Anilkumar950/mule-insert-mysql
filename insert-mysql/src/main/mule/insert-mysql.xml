@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="e106adc3-daf1-42ba-918f-c4afa17b5505" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Anilkumar@950" />
+	</db:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="2af9a9e7-a4ed-4126-98ff-0ea32087c95f" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="insert-mysqlFlow" doc:id="29cc91ab-484c-4d2a-b45d-fc32f1f705bd" >
+		<http:listener doc:name="Listener" doc:id="1f290893-31d2-404e-8dcb-ba7ac6b7519b" config-ref="HTTP_Listener_config" path="insert"/>
+		<db:insert doc:name="Insert" doc:id="29122ef8-7fa6-4f2d-a3a4-1388e4c0f37d" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into anilkumar.student(name, id, phno, fee, city, country) values ('venkatesh', 'ab2336', '80778899', '503100', 'n3btr1', 'ap')]]></db:sql>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="b5898799-0128-40bc-959d-8566821cd317" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="4bf8c914-86b5-4bb4-8e91-29cea936bd69" message="#[payload]"/>
+	</flow>
+</mule>
